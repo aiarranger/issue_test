@@ -32,12 +32,43 @@ async function listIssues() {
   return all;
 }
 
+function issueStatus(status) {
+  return {
+    READY: "次にできる",
+    ACTIVE: "作業中",
+    BLOCKED: "前の作業待ち",
+    DONE: "完了"
+  }[status] || status;
+}
+
 function issueIcon(status) {
-  return {READY:"○", ACTIVE:"▶", BLOCKED:"⛔", DONE:"✅"}[status] || "?";
+  return {READY:"➡️", ACTIVE:"🔨", BLOCKED:"⏳", DONE:"✅"}[status] || "";
+}
+
+function milestoneStatus(status) {
+  return {
+    "NOT STARTED":"これから",
+    BUILDING:"作っている",
+    BLOCKED:"止まっている",
+    "READY TO VERIFY":"人が確認する番",
+    VERIFYING:"確認中",
+    VERIFIED:"確認できた"
+  }[status] || status;
 }
 
 function milestoneIcon(status) {
-  return {"NOT STARTED":"○", BUILDING:"▶", BLOCKED:"⛔", "READY TO VERIFY":"👀", VERIFYING:"🔎", VERIFIED:"✅"}[status] || "?";
+  return {
+    "NOT STARTED":"○",
+    BUILDING:"🔨",
+    BLOCKED:"⛔",
+    "READY TO VERIFY":"👀",
+    VERIFYING:"👀",
+    VERIFIED:"✅"
+  }[status] || "";
+}
+
+function cleanForMermaid(text) {
+  return String(text).replaceAll('"', "'").replaceAll("\n", " ");
 }
 
 const githubIssues = (await listIssues()).map((issue) => ({
@@ -49,11 +80,45 @@ const githubIssues = (await listIssues()).map((issue) => ({
 const result = calculateProjectState(config, githubIssues);
 const lines = [];
 
-lines.push("# AISNS Project Dashboard", "");
-lines.push("> CIが自動生成します。正本は `project.json` とGitHub Issueのopen/closedです。", "");
-lines.push("**Goal:** " + config.goal, "", "## 現在地", "");
-lines.push("| Milestone | 状態 | " + config.categories.map((c) => c.id).join(" | ") + " |");
-lines.push("|---|---|" + config.categories.map(() => "---").join("|") + "|");
+lines.push("# AISNS 現在地", "");
+lines.push("**目指すもの:** " + config.goal, "");
+
+lines.push("## いまやること", "");
+if (!result.firstIncomplete) {
+  lines.push("✅ 5つのゴールをすべて確認できました。");
+} else {
+  const number = result.sortedMilestones.findIndex((m) => m.id === result.firstIncomplete.id) + 1;
+  lines.push("### " + number + ". " + result.firstIncomplete.label);
+  lines.push("");
+  if (result.focus.length) {
+    for (const issue of result.focus) {
+      lines.push("- " + issueIcon(issue.status) + " **#" + issue.number + " " + issue.title + "**");
+    }
+  } else {
+    const blocked = result.executions.filter((i) =>
+      i.meta.milestone === result.firstIncomplete.id && i.status === "BLOCKED"
+    );
+    for (const issue of blocked) {
+      const reason = issue.meta.manual_state === "blocked"
+        ? "手動で停止中"
+        : "待ち: " + issue.unresolved.map((n) => "#" + n).join(", ");
+      lines.push("- ⏳ **#" + issue.number + " " + issue.title + "** — " + reason);
+    }
+  }
+}
+
+lines.push("", "## 5つのゴール", "");
+lines.push("| 順番 | できるようになること | 状況 |");
+lines.push("|---:|---|---|");
+for (let i = 0; i < result.sortedMilestones.length; i += 1) {
+  const milestone = result.sortedMilestones[i];
+  const state = result.milestoneStates.get(milestone.id);
+  lines.push("| " + (i + 1) + " | **" + milestone.label + "** | " + milestoneIcon(state) + " " + milestoneStatus(state) + " |");
+}
+
+lines.push("", "<details>", "<summary><b>詳しい状況を見る</b></summary>", "");
+lines.push("| ゴール | " + config.categories.map((c) => c.label).join(" | ") + " |");
+lines.push("|---|" + config.categories.map(() => "---").join("|") + "|");
 
 for (const milestone of result.sortedMilestones) {
   const cells = config.categories.map((category) => {
@@ -61,32 +126,15 @@ for (const milestone of result.sortedMilestones) {
       .filter((issue) => issue.meta.milestone === milestone.id && issue.meta.category === category.id)
       .sort((a,b) => a.number - b.number);
     return matches.length
-      ? matches.map((issue) => "#" + issue.number + " " + issueIcon(issue.status) + " " + issue.status).join("<br>")
+      ? matches.map((issue) =>
+          "#" + issue.number + " " + issue.title + "<br>" +
+          issueIcon(issue.status) + " " + issueStatus(issue.status)
+        ).join("<br><br>")
       : "—";
   });
-  const state = result.milestoneStates.get(milestone.id);
-  lines.push("| **" + milestone.id + " " + milestone.label + "** | " + milestoneIcon(state) + " **" + state + "** | " + cells.join(" | ") + " |");
+  lines.push("| **" + milestone.label + "** | " + cells.join(" | ") + " |");
 }
-
-lines.push("", "## 次に見るもの", "");
-
-if (!result.firstIncomplete) {
-  lines.push("✅ すべてのMilestoneがVERIFIEDです。");
-} else {
-  lines.push("現在の焦点: **" + result.firstIncomplete.id + " " + result.firstIncomplete.label + " — " + result.milestoneStates.get(result.firstIncomplete.id) + "**", "");
-  if (result.focus.length) {
-    for (const issue of result.focus) {
-      lines.push("- " + issueIcon(issue.status) + " **#" + issue.number + " " + issue.status + "** — " + issue.title);
-    }
-  } else {
-    for (const issue of result.executions.filter((i) => i.meta.milestone === result.firstIncomplete.id && i.status === "BLOCKED")) {
-      const reason = issue.meta.manual_state === "blocked"
-        ? "manual blocked"
-        : "待ち: " + issue.unresolved.map((n) => "#" + n).join(", ");
-      lines.push("- ⛔ **#" + issue.number + " BLOCKED** — " + reason);
-    }
-  }
-}
+lines.push("", "</details>");
 
 if (result.firstIncomplete) {
   const focusMilestoneId = result.firstIncomplete.id;
@@ -97,30 +145,27 @@ if (result.firstIncomplete) {
   }
   const graphIssues = result.executions.filter((issue) => focusNumbers.has(issue.number));
 
-  lines.push("", "<details>", "<summary>現在の依存関係</summary>", "", "\`\`\`mermaid", "flowchart LR");
+  lines.push("", "<details>", "<summary><b>なぜ待っているかを見る</b></summary>", "", "```mermaid", "flowchart LR");
   for (const issue of graphIssues) {
-    lines.push("N" + issue.number + '["#' + issue.number + " " + issue.meta.category + " / " + issue.status + '"]');
+    lines.push("N" + issue.number + '["#' + issue.number + " " + cleanForMermaid(issue.title) + "<br>" + issueStatus(issue.status) + '"]');
   }
   for (const issue of focusIssues) {
     for (const dep of issue.meta.depends_on) {
       if (focusNumbers.has(dep)) lines.push("N" + dep + " --> N" + issue.number);
     }
   }
-  lines.push("\`\`\`", "", "</details>");
+  lines.push("```", "", "</details>");
 }
 
-lines.push("", "## 構造チェック", "");
-if (result.errors.length === 0) lines.push("✅ 構造エラーなし");
+lines.push("", "<details>", "<summary>管理情報</summary>", "");
+if (result.errors.length === 0) lines.push("✅ Issueの構造に問題はありません。");
 else for (const error of result.errors) lines.push("- ⚠️ " + error);
-
-lines.push("", "<details>", "<summary>状態ルール</summary>", "");
-lines.push("- 構造・依存・手動状態: project.json");
-lines.push("- 完了: GitHub IssueのClose");
-lines.push("- Issue: READY / ACTIVE / BLOCKED / DONE");
-lines.push("- Milestone: NOT STARTED / BUILDING / BLOCKED / READY TO VERIFY / VERIFYING / VERIFIED");
-lines.push("- 進捗率は計算しません。");
-lines.push("- Issue本文の説明文・チェックボックスは状態計算に使いません。", "", "</details>", "");
-lines.push("_Last recalculated: " + new Date().toISOString() + "_");
+lines.push("");
+lines.push("- 構造・依存関係: `project.json`");
+lines.push("- 完了: GitHub IssueをClose");
+lines.push("- 進捗率は使いません。");
+lines.push("", "</details>", "");
+lines.push("_自動更新: " + new Date().toISOString() + "_");
 
 const dashboardBody = lines.join("\n");
 
