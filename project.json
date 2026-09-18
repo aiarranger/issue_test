@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "dashboard_issue": 19,
+  "goal": "自分のキャラで小さな世界に入り、誰かとの出来事が残り、翌日戻ると「昨日の続き」を感じられる。",
+  "categories": [
+    {
+      "id": "APP",
+      "label": "アプリ"
+    },
+    {
+      "id": "PLATFORM",
+      "label": "基盤"
+    },
+    {
+      "id": "DATA",
+      "label": "データ"
+    },
+    {
+      "id": "VERIFY",
+      "label": "検証"
+    },
+    {
+      "id": "OPS",
+      "label": "運用"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "M0",
+      "label": "入れる",
+      "order": 0
+    },
+    {
+      "id": "M1",
+      "label": "残る",
+      "order": 1
+    },
+    {
+      "id": "M2",
+      "label": "一緒にいる",
+      "order": 2
+    },
+    {
+      "id": "M3",
+      "label": "続きがある",
+      "order": 3
+    },
+    {
+      "id": "M4",
+      "label": "Pilot",
+      "order": 4
+    }
+  ],
+  "issue_metadata_marker": "AISNS_STATE",
+  "issue_states": [
+    "READY",
+    "ACTIVE",
+    "BLOCKED",
+    "DONE"
+  ],
+  "milestone_states": [
+    "NOT STARTED",
+    "BUILDING",
+    "BLOCKED",
+    "READY TO VERIFY",
+    "VERIFYING",
+    "VERIFIED"
+  ]
+}
