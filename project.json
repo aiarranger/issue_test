@@ -1,8 +1,12 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "dashboard_issue": 19,
   "goal": "自分のキャラで遊び、次の日にも続きがある世界を作る。",
   "categories": [
+    {
+      "id": "EXPERIENCE",
+      "label": "体験を決める"
+    },
     {
       "id": "APP",
       "label": "画面・操作"
@@ -67,11 +71,21 @@
   ],
   "issues": [
     {
+      "number": 21,
+      "milestone": "M0",
+      "category": "EXPERIENCE",
+      "required": true,
+      "depends_on": [],
+      "manual_state": null
+    },
+    {
       "number": 2,
       "milestone": "M0",
       "category": "PLATFORM",
       "required": true,
-      "depends_on": [],
+      "depends_on": [
+        21
+      ],
       "manual_state": null
     },
     {
@@ -80,7 +94,7 @@
       "category": "DATA",
       "required": true,
       "depends_on": [
-        2
+        21
       ],
       "manual_state": null
     },
@@ -107,12 +121,22 @@
       "manual_state": null
     },
     {
+      "number": 22,
+      "milestone": "M1",
+      "category": "EXPERIENCE",
+      "required": true,
+      "depends_on": [
+        5
+      ],
+      "manual_state": null
+    },
+    {
       "number": 6,
       "milestone": "M1",
       "category": "DATA",
       "required": true,
       "depends_on": [
-        5
+        22
       ],
       "manual_state": null
     },
@@ -122,7 +146,7 @@
       "category": "PLATFORM",
       "required": true,
       "depends_on": [
-        5
+        22
       ],
       "manual_state": null
     },
@@ -149,12 +173,22 @@
       "manual_state": null
     },
     {
+      "number": 23,
+      "milestone": "M2",
+      "category": "EXPERIENCE",
+      "required": true,
+      "depends_on": [
+        9
+      ],
+      "manual_state": null
+    },
+    {
       "number": 10,
       "milestone": "M2",
       "category": "PLATFORM",
       "required": true,
       "depends_on": [
-        9
+        23
       ],
       "manual_state": null
     },
@@ -180,12 +214,22 @@
       "manual_state": null
     },
     {
+      "number": 24,
+      "milestone": "M3",
+      "category": "EXPERIENCE",
+      "required": true,
+      "depends_on": [
+        12
+      ],
+      "manual_state": null
+    },
+    {
       "number": 13,
       "milestone": "M3",
       "category": "PLATFORM",
       "required": true,
       "depends_on": [
-        12
+        24
       ],
       "manual_state": null
     },
@@ -195,7 +239,7 @@
       "category": "DATA",
       "required": true,
       "depends_on": [
-        13
+        24
       ],
       "manual_state": null
     },
@@ -222,12 +266,22 @@
       "manual_state": null
     },
     {
+      "number": 25,
+      "milestone": "M4",
+      "category": "EXPERIENCE",
+      "required": true,
+      "depends_on": [
+        16
+      ],
+      "manual_state": null
+    },
+    {
       "number": 17,
       "milestone": "M4",
       "category": "OPS",
       "required": true,
       "depends_on": [
-        16
+        25
       ],
       "manual_state": null
     },
