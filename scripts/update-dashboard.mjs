@@ -32,17 +32,6 @@ async function listIssues() {
   return all;
 }
 
-function parseMeta(issue) {
-  const marker = "<!-- " + (config.issue_metadata_marker || "AISNS_STATE") + " ";
-  const body = issue.body || "";
-  const start = body.indexOf(marker);
-  if (start < 0) return null;
-  const end = body.indexOf(" -->", start + marker.length);
-  if (end < 0) return {__parse_error: "closing marker not found"};
-  try { return JSON.parse(body.slice(start + marker.length, end)); }
-  catch (error) { return {__parse_error: error.message}; }
-}
-
 function issueIcon(status) {
   return {READY:"○", ACTIVE:"▶", BLOCKED:"⛔", DONE:"✅"}[status] || "?";
 }
@@ -51,29 +40,17 @@ function milestoneIcon(status) {
   return {"NOT STARTED":"○", BUILDING:"▶", BLOCKED:"⛔", "READY TO VERIFY":"👀", VERIFYING:"🔎", VERIFIED:"✅"}[status] || "?";
 }
 
-const githubIssues = await listIssues();
-const parseErrors = [];
-const normalized = [];
+const githubIssues = (await listIssues()).map((issue) => ({
+  number: issue.number,
+  title: issue.title,
+  github_state: issue.state
+}));
 
-for (const issue of githubIssues) {
-  const meta = parseMeta(issue);
-  if (meta?.__parse_error) {
-    parseErrors.push("#" + issue.number + ": AISNS_STATE JSONが壊れています (" + meta.__parse_error + ")");
-  }
-  normalized.push({
-    number: issue.number,
-    title: issue.title,
-    github_state: issue.state,
-    meta: meta?.__parse_error ? null : meta
-  });
-}
-
-const result = calculateProjectState(config, normalized);
-result.errors.unshift(...parseErrors);
-
+const result = calculateProjectState(config, githubIssues);
 const lines = [];
+
 lines.push("# AISNS Project Dashboard", "");
-lines.push("> CIが自動生成します。正本は `project.json`、各Issueの `AISNS_STATE`、GitHubのopen/closedです。", "");
+lines.push("> CIが自動生成します。正本は `project.json` とGitHub Issueのopen/closedです。", "");
 lines.push("**Goal:** " + config.goal, "", "## 現在地", "");
 lines.push("| Milestone | 状態 | " + config.categories.map((c) => c.id).join(" | ") + " |");
 lines.push("|---|---|" + config.categories.map(() => "---").join("|") + "|");
@@ -103,7 +80,7 @@ if (!result.firstIncomplete) {
     }
   } else {
     for (const issue of result.executions.filter((i) => i.meta.milestone === result.firstIncomplete.id && i.status === "BLOCKED")) {
-      const reason = issue.meta.blocked === true
+      const reason = issue.meta.manual_state === "blocked"
         ? "manual blocked"
         : "待ち: " + issue.unresolved.map((n) => "#" + n).join(", ");
       lines.push("- ⛔ **#" + issue.number + " BLOCKED** — " + reason);
@@ -116,6 +93,8 @@ if (result.errors.length === 0) lines.push("✅ 構造エラーなし");
 else for (const error of result.errors) lines.push("- ⚠️ " + error);
 
 lines.push("", "<details>", "<summary>状態ルール</summary>", "");
+lines.push("- 構造・依存・手動状態: project.json");
+lines.push("- 完了: GitHub IssueのClose");
 lines.push("- Issue: READY / ACTIVE / BLOCKED / DONE");
 lines.push("- Milestone: NOT STARTED / BUILDING / BLOCKED / READY TO VERIFY / VERIFYING / VERIFIED");
 lines.push("- 進捗率は計算しません。");
