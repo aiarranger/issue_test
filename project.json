@@ -1,57 +1,57 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "dashboard_issue": 19,
   "goal": "自分のキャラで遊び、次の日にも続きがある世界を作る。",
   "categories": [
     {
       "id": "EXPERIENCE",
-      "label": "体験を決める"
+      "label": "UX"
     },
     {
       "id": "APP",
-      "label": "画面・操作"
+      "label": "App"
     },
     {
       "id": "PLATFORM",
-      "label": "裏のしくみ"
+      "label": "Platform"
     },
     {
       "id": "DATA",
-      "label": "素材・内容"
+      "label": "Data"
     },
     {
       "id": "VERIFY",
-      "label": "確認"
+      "label": "QA"
     },
     {
       "id": "OPS",
-      "label": "公開・運用"
+      "label": "Ops"
     }
   ],
   "milestones": [
     {
       "id": "M0",
-      "label": "島に入って歩ける",
+      "label": "入って歩く",
       "order": 0
     },
     {
       "id": "M1",
-      "label": "遊んだことが残る",
+      "label": "遊びが残る",
       "order": 1
     },
     {
       "id": "M2",
-      "label": "友だちと一緒に遊べる",
+      "label": "一緒に遊ぶ",
       "order": 2
     },
     {
       "id": "M3",
-      "label": "次の日に続きがある",
+      "label": "次の日に続く",
       "order": 3
     },
     {
       "id": "M4",
-      "label": "2日使って価値を確かめる",
+      "label": "2日で試す",
       "order": 4
     }
   ],
