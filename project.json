@@ -1,53 +1,53 @@
 {
   "schema_version": 2,
   "dashboard_issue": 19,
-  "goal": "自分のキャラで小さな世界に入り、誰かとの出来事が残り、翌日戻ると「昨日の続き」を感じられる。",
+  "goal": "自分のキャラで遊び、次の日にも続きがある世界を作る。",
   "categories": [
     {
       "id": "APP",
-      "label": "アプリ"
+      "label": "画面・操作"
     },
     {
       "id": "PLATFORM",
-      "label": "基盤"
+      "label": "裏のしくみ"
     },
     {
       "id": "DATA",
-      "label": "データ"
+      "label": "素材・内容"
     },
     {
       "id": "VERIFY",
-      "label": "検証"
+      "label": "確認"
     },
     {
       "id": "OPS",
-      "label": "運用"
+      "label": "公開・運用"
     }
   ],
   "milestones": [
     {
       "id": "M0",
-      "label": "入れる",
+      "label": "島に入って歩ける",
       "order": 0
     },
     {
       "id": "M1",
-      "label": "残る",
+      "label": "遊んだことが残る",
       "order": 1
     },
     {
       "id": "M2",
-      "label": "一緒にいる",
+      "label": "友だちと一緒に遊べる",
       "order": 2
     },
     {
       "id": "M3",
-      "label": "続きがある",
+      "label": "次の日に続きがある",
       "order": 3
     },
     {
       "id": "M4",
-      "label": "Pilot",
+      "label": "2日使って価値を確かめる",
       "order": 4
     }
   ],
