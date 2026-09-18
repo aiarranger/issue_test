@@ -18,7 +18,9 @@ on:
       - main
     paths:
       - project.json
+      - lib/project-state.mjs
       - scripts/update-dashboard.mjs
+      - test/project-state.test.mjs
       - .github/workflows/update-dashboard.yml
   workflow_dispatch:
 
@@ -42,6 +44,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      - name: Verify state machine
+        run: node --test test/project-state.test.mjs
 
       - name: Recalculate dashboard
         run: node scripts/update-dashboard.mjs
