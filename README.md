@@ -1,33 +1,44 @@
 # AISNS Issue Dashboard Prototype
 
-このリポジトリは、Issueを作業の正本にしつつ、現在地をLLMなしで機械的に可視化する試作です。
+Issueを作業の正本にしつつ、現在地をLLMなしで機械的に可視化する試作です。
 
 ## 正本
 
-- `project.json`: プロジェクト全体のゴール、Milestone、Category、Dashboard設定
-- 各Issue先頭の `AISNS_STATE` JSON: Issueの構造化メタデータ
-- GitHub Issueの open / closed: 完了状態
+- `project.json`: ゴール、Milestone、Category、Issue所属、依存、手動状態
+- GitHub Issueの `open / closed`: 完了状態
+- Dashboard Issue #19: 派生表示。直接編集した内容は正本ではない
 
-Dashboard Issue #19 は派生表示であり、直接編集した内容は正本ではありません。
+Issue本文にある旧 `AISNS_STATE` コメントは互換用の残骸で、現在の計算では読みません。
 
-## Issueメタデータ
+## project.json のIssue定義
 
-各実行Issueの先頭に次の形式を置きます。
+例:
 
-`<!-- AISNS_STATE {"type":"execution","milestone":"M0","category":"APP","required":true,"depends_on":[2],"doing":false} -->`
+```json
+{
+  "number": 4,
+  "milestone": "M0",
+  "category": "APP",
+  "required": true,
+  "depends_on": [2, 3],
+  "manual_state": null
+}
+```
 
-任意フィールド:
-- `doing: true`: 現在作業中
-- `blocked: true`: 依存関係とは別に手動で停止
-- `verify_gate: true`: Milestoneの人間確認Issue
+`manual_state`:
+- `null`: 依存が解消していればREADY
+- `"doing"`: ACTIVE
+- `"blocked"`: 手動BLOCKED
+
+IssueをCloseするとDONEです。
 
 ## 自動状態
 
 Issue:
-- READY: open・依存解消・doing=false
-- ACTIVE: open・doing=true
-- BLOCKED: open・未完了dependencyあり、またはblocked=true
-- DONE: closed
+- READY
+- ACTIVE
+- BLOCKED
+- DONE
 
 Milestone:
 - NOT STARTED
@@ -37,4 +48,10 @@ Milestone:
 - VERIFYING
 - VERIFIED
 
-Issue更新時と `project.json` / Dashboardスクリプト変更時にGitHub Actionsが再計算し、#19を書き換えます。
+Issue更新時と `project.json` / 状態ロジック変更時にGitHub Actionsが再計算し、#19を書き換えます。
+
+## テスト
+
+`node --test test/project-state.test.mjs`
+
+状態遷移、再open、依存循環、未定義dependencyをLLMなしで検証します。
