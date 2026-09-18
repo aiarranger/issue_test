@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "dashboard_issue": 19,
   "goal": "自分のキャラで小さな世界に入り、誰かとの出来事が残り、翌日戻ると「昨日の続き」を感じられる。",
   "categories": [
@@ -51,7 +51,6 @@
       "order": 4
     }
   ],
-  "issue_metadata_marker": "AISNS_STATE",
   "issue_states": [
     "READY",
     "ACTIVE",
@@ -65,5 +64,183 @@
     "READY TO VERIFY",
     "VERIFYING",
     "VERIFIED"
+  ],
+  "issues": [
+    {
+      "number": 2,
+      "milestone": "M0",
+      "category": "PLATFORM",
+      "required": true,
+      "depends_on": [],
+      "manual_state": null
+    },
+    {
+      "number": 3,
+      "milestone": "M0",
+      "category": "DATA",
+      "required": true,
+      "depends_on": [
+        2
+      ],
+      "manual_state": null
+    },
+    {
+      "number": 4,
+      "milestone": "M0",
+      "category": "APP",
+      "required": true,
+      "depends_on": [
+        2,
+        3
+      ],
+      "manual_state": null
+    },
+    {
+      "number": 5,
+      "milestone": "M0",
+      "category": "VERIFY",
+      "required": true,
+      "verify_gate": true,
+      "depends_on": [
+        4
+      ],
+      "manual_state": null
+    },
+    {
+      "number": 6,
+      "milestone": "M1",
+      "category": "DATA",
+      "required": true,
+      "depends_on": [
+        5
+      ],
+      "manual_state": null
+    },
+    {
+      "number": 7,
+      "milestone": "M1",
+      "category": "PLATFORM",
+      "required": true,
+      "depends_on": [
+        5
+      ],
+      "manual_state": null
+    },
+    {
+      "number": 8,
+      "milestone": "M1",
+      "category": "APP",
+      "required": true,
+      "depends_on": [
+        6,
+        7
+      ],
+      "manual_state": null
+    },
+    {
+      "number": 9,
+      "milestone": "M1",
+      "category": "VERIFY",
+      "required": true,
+      "verify_gate": true,
+      "depends_on": [
+        8
+      ],
+      "manual_state": null
+    },
+    {
+      "number": 10,
+      "milestone": "M2",
+      "category": "PLATFORM",
+      "required": true,
+      "depends_on": [
+        9
+      ],
+      "manual_state": null
+    },
+    {
+      "number": 11,
+      "milestone": "M2",
+      "category": "APP",
+      "required": true,
+      "depends_on": [
+        10
+      ],
+      "manual_state": null
+    },
+    {
+      "number": 12,
+      "milestone": "M2",
+      "category": "VERIFY",
+      "required": true,
+      "verify_gate": true,
+      "depends_on": [
+        11
+      ],
+      "manual_state": null
+    },
+    {
+      "number": 13,
+      "milestone": "M3",
+      "category": "PLATFORM",
+      "required": true,
+      "depends_on": [
+        12
+      ],
+      "manual_state": null
+    },
+    {
+      "number": 14,
+      "milestone": "M3",
+      "category": "DATA",
+      "required": true,
+      "depends_on": [
+        13
+      ],
+      "manual_state": null
+    },
+    {
+      "number": 15,
+      "milestone": "M3",
+      "category": "APP",
+      "required": true,
+      "depends_on": [
+        13,
+        14
+      ],
+      "manual_state": null
+    },
+    {
+      "number": 16,
+      "milestone": "M3",
+      "category": "VERIFY",
+      "required": true,
+      "verify_gate": true,
+      "depends_on": [
+        15
+      ],
+      "manual_state": null
+    },
+    {
+      "number": 17,
+      "milestone": "M4",
+      "category": "OPS",
+      "required": true,
+      "depends_on": [
+        16
+      ],
+      "manual_state": null
+    },
+    {
+      "number": 18,
+      "milestone": "M4",
+      "category": "VERIFY",
+      "required": true,
+      "verify_gate": true,
+      "depends_on": [
+        17
+      ],
+      "manual_state": null
+    }
   ]
 }
