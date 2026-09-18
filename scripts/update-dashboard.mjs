@@ -88,6 +88,27 @@ if (!result.firstIncomplete) {
   }
 }
 
+if (result.firstIncomplete) {
+  const focusMilestoneId = result.firstIncomplete.id;
+  const focusIssues = result.executions.filter((issue) => issue.meta.milestone === focusMilestoneId);
+  const focusNumbers = new Set(focusIssues.map((issue) => issue.number));
+  for (const issue of focusIssues) {
+    for (const dep of issue.meta.depends_on) focusNumbers.add(dep);
+  }
+  const graphIssues = result.executions.filter((issue) => focusNumbers.has(issue.number));
+
+  lines.push("", "<details>", "<summary>現在の依存関係</summary>", "", "\`\`\`mermaid", "flowchart LR");
+  for (const issue of graphIssues) {
+    lines.push("N" + issue.number + '["#' + issue.number + " " + issue.meta.category + " / " + issue.status + '"]');
+  }
+  for (const issue of focusIssues) {
+    for (const dep of issue.meta.depends_on) {
+      if (focusNumbers.has(dep)) lines.push("N" + dep + " --> N" + issue.number);
+    }
+  }
+  lines.push("\`\`\`", "", "</details>");
+}
+
 lines.push("", "## 構造チェック", "");
 if (result.errors.length === 0) lines.push("✅ 構造エラーなし");
 else for (const error of result.errors) lines.push("- ⚠️ " + error);
