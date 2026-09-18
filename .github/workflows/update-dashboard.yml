@@ -1,0 +1,49 @@
+name: Update AISNS project dashboard
+
+on:
+  issues:
+    types:
+      - opened
+      - edited
+      - closed
+      - reopened
+      - assigned
+      - unassigned
+      - labeled
+      - unlabeled
+      - milestoned
+      - demilestoned
+  push:
+    branches:
+      - main
+    paths:
+      - project.json
+      - scripts/update-dashboard.mjs
+      - .github/workflows/update-dashboard.yml
+  workflow_dispatch:
+
+concurrency:
+  group: aisns-project-dashboard
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  update:
+    if: github.event_name != 'issues' || github.event.issue.number != 19
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Recalculate dashboard
+        run: node scripts/update-dashboard.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
